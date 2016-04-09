@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8" />
+<title>WebSocket Client Test to ws://localhost:8080/EchoChamber/echo</title>
+
+<script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://localhost:8080/EchoServer/echo";
+  var websocket;
+  var output;
+  var messageNumber = 1;
+
+  function init() {
+    output = document.getElementById("output");
+  }
+
+  function connect() {
+    // Create WebSocket connection
+    websocket = new WebSocket(wsUri);
+    writeToScreen("WebSocket.readyState = " + getReadyStateValue(websocket.readyState));
+
+    // Event handler for successful WebSocket connection establishment
+    websocket.onopen = function(evt) {
+      writeToScreen("CONNECTED to " + wsUri);
+      writeToScreen("WebSocket.readyState = " + getReadyStateValue(websocket.readyState));
+    };
+
+    // Event handler for disconnect
+    websocket.onclose = function(evt) {
+      writeToScreen("DISCONNECTED: WebSocket Close code = " + evt.code);
+      writeToScreen("WebSocket.readyState = " + getReadyStateValue(websocket.readyState));
+    };
+
+    // Event handler for message received
+    websocket.onmessage = function(evt) {
+      writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
+    };
+  }
+
+  function disconnect() {
+    websocket.close();
+  }
+
+  function send() {
+    message = "Message #" + messageNumber++
+    websocket.send(message);
+    writeToScreen("SENT: " + "message");
+  }
+
+  function getReadyStateValue(readyState) {
+    var msg = '';
+    switch (readyState) {
+      case 0:
+        msg = 'WebSocket.CONNECTING';
+        break;
+      case 1:
+        msg = 'WebSocket.OPEN';
+        break;
+      case 2:
+        msg = 'WebSocket.CLOSING';
+        break;
+      case 3:
+        msg = 'WebSocket.CLOSED';
+        break;
+    };
+    return msg;
+  }
+
+  function writeToScreen(message) {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", init, false);
+
+</script>
+
+<h2>WebSocket Test to ws://localhost:8080/EchoChamber/echo</h2>
+<div id="output"></div>
+
+<button onclick="connect()">Connect</button>
+<button onclick="disconnect()">Disconnect</button>
+<button onclick="send()">Send a message</button>
+
+</html>
